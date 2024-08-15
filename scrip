@@ -1,0 +1,75 @@
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "sap/viz/ui5/controls/common/feeds/FeedItem",
+    "sap/viz/ui5/data/FlattenedDataset",
+    "sap/m/MessageToast"   
+
+], function(Controller, FeedItem, FlattenedDataset, MessageToast) {
+    "use strict";
+
+    return Controller.extend("namespace.controller.Stats", {
+        onInit: function() {
+            // Inicializar el modelo de datos
+            var oModel = new sap.ui.model.json.JSONModel();
+            oModel.setData({teams: []});
+            this.getView().setModel(oModel);
+        },
+
+        validateMatches: function(value) {
+            if (value < 0 || value > 3) {
+                return "Error";
+            }
+            return "None";
+        },
+
+        onDisplayStats: function() {
+            var oModel = this.getView().getModel();
+            var aData = oModel.getData().teams;
+
+            // Validación de la suma total de partidos
+            var totalMatches = aData.reduce((sum, team) => sum + team.matches, 0);
+            if (totalMatches > 3) {
+                MessageToast.show("La suma total de partidos no puede ser mayor a 3");
+                return;
+            }
+
+            // Crear el dataset para el gráfico
+            var oDataset = new FlattenedDataset({
+                dimensions: [{
+                    name: 'Seleccionado',
+                    value: "{name}"
+                }],
+                measures: [{
+                    name: 'Partidos',
+                    value: "{matches}"
+                }],
+                data: {
+                    path: "/teams"
+                }
+            });
+
+            // Configurar el gráfico (ejemplo básico)
+            var oVizFrame = this.getView().byId("chart");
+            oVizFrame.setDataset(oDataset);
+            oVizFrame.setVizType("column");
+            var feedTitle = new FeedItem({
+                'uid': "title",
+                'type': "Title",
+                'values': ["Partidos por Seleccionado"]
+            });
+            oVizFrame.addFeed(feedTitle);
+            var feedValueAxis = new FeedItem({
+                'uid': "valueAxis",
+                'type': "Axis",
+                'values': ["Partidos"]
+            });
+            oVizFrame.addFeed(feedValueAxis);
+            var feedCategoryAxis = new FeedItem({
+                'uid': "categoryAxis",
+                'type': "CategoryAxis",
+                'values': ["Seleccionado"]
+            });
+            oVizFrame.addFeed(feedCategoryAxis);
+        }
+    });
+});
