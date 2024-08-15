@@ -1,0 +1,25 @@
+<mvc:View controllerName="namespace.controller.Stats" xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m" xmlns:viz="sap.viz.ui5" xmlns:core="sap.ui.core">
+    <Page title="Estadísticas de Fútbol">
+        <Table id="teamsTable" items="{path: '/teams'}">
+            <columns>
+                <Column>
+                    <Text text="Seleccionado" />
+                </Column>
+                <Column>
+                    <Text text="Partidos" />
+                </Column>
+            </columns>
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <Input type="Text" value="{name}" />
+                        <Input type="Number" value="{matches}" valueState="{parts: 'matches', formatter: '.validateMatches'}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+        <Button text="Mostrar Estadísticas" press="onDisplayStats" />
+        <viz:VizFrame id="chart" />
+    </Page>
+</mvc:View>
